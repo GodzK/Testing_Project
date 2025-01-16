@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Stock</title>
+</head>
+
+<body>
+  <p>status: <span id="connect-status">Connecting</span></p>
+  <button id="stop-sse" onclick="stopSSE()">Stop</button>
+  <h1>Stock Price:</h1>
+  <ul id="stocks"></ul>
+
+  <script>
+    const stockElem = document.getElementById('stocks');
+    const statusElem = document.getElementById('connect-status');
+
+    // เชื่อมต่อ API ที่ใช้เป็น SSE
+    const eventSource = new EventSource('http://localhost:4000/stock-price');
+
+    // Handle ตอนที่เปิดการเชื่อมต่อสำเร็จแล้ว
+    eventSource.onopen = (event) => {
+      statusElem.textContent = 'Connected'
+    }
+
+    // Handle ตอนที่มีข้อความใหม่ส่งมา
+    eventSource.onmessage = (event) => {
+      const number = JSON.parse(event.data);
+      const listItem = document.createElement('li');
+      listItem.innerText = number;
+      stockElem.appendChild(listItem);
+    };
+
+    function stopSSE() {
+      eventSource.close();
+      statusElem.textContent = 'Closed'
+    }
+  </script>
+</body>
+
+</html>
